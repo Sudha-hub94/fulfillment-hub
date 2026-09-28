@@ -1,0 +1,19 @@
+.dialog-body {
+  display: flex;
+  flex-direction: column;
+  padding-top: 1rem;
+  min-width: 480px;
+}
+
+.dialog-row {
+  display: flex;
+  gap: 1rem;
+
+  mat-form-field {
+    flex: 1 1 0;
+  }
+}
+
+mat-slide-toggle {
+  margin: 0.5rem 0 1rem;
+}

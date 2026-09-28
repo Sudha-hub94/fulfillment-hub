@@ -1,0 +1,107 @@
+<div class="page">
+  <header class="page-header">
+    <div>
+      <h1>Shipments</h1>
+      <p class="page-subtitle">Track parcels from pick-up to delivery.</p>
+    </div>
+    <div class="page-actions">
+      <button mat-stroked-button (click)="loadShipments()">
+        <mat-icon>refresh</mat-icon>
+        Refresh
+      </button>
+      <button mat-flat-button color="primary" (click)="addShipment()">
+        <mat-icon>add</mat-icon>
+        New Shipment
+      </button>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <div class="state">
+      <mat-spinner diameter="40" />
+      <p>Loading shipments&hellip;</p>
+    </div>
+  } @else if (error()) {
+    <div class="state state-error">
+      <mat-icon>error_outline</mat-icon>
+      <p>{{ error() }}</p>
+      <button mat-stroked-button color="warn" (click)="loadShipments()">Retry</button>
+    </div>
+  } @else {
+    <mat-form-field appearance="outline" class="search-field" subscriptSizing="dynamic">
+      <mat-label>Search shipments</mat-label>
+      <mat-icon matPrefix>search</mat-icon>
+      <input matInput (input)="applyFilter($event)" placeholder="Tracking number, carrier or order" />
+    </mat-form-field>
+
+    @if (filteredShipments().length === 0) {
+      <div class="state">
+        <mat-icon>local_shipping</mat-icon>
+        <p>No shipments found.</p>
+      </div>
+    } @else {
+      <div class="table-container mat-elevation-z2">
+        <table mat-table [dataSource]="pagedShipments()">
+          <ng-container matColumnDef="tracking_number">
+            <th mat-header-cell *matHeaderCellDef>Tracking #</th>
+            <td mat-cell *matCellDef="let shipment">{{ shipment.tracking_number }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="order">
+            <th mat-header-cell *matHeaderCellDef>Order</th>
+            <td mat-cell *matCellDef="let shipment">{{ orderLabel(shipment) }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="carrier">
+            <th mat-header-cell *matHeaderCellDef>Carrier</th>
+            <td mat-cell *matCellDef="let shipment">
+              {{ shipment.carrier || '-' }}
+              @if (shipment.service_level) {
+                <span class="muted">{{ shipment.service_level }}</span>
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let shipment">
+              <span class="status-chip" [ngClass]="'status-' + shipment.status">
+                {{ statusLabel(shipment.status) }}
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="estimated_delivery">
+            <th mat-header-cell *matHeaderCellDef>Estimated delivery</th>
+            <td mat-cell *matCellDef="let shipment">
+              {{ shipment.estimated_delivery ? (shipment.estimated_delivery | date: 'mediumDate') : '-' }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let shipment">
+              <button mat-icon-button color="primary" matTooltip="Edit shipment" (click)="editShipment(shipment)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" matTooltip="Delete shipment" (click)="deleteShipment(shipment)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        </table>
+
+        <mat-paginator
+          [length]="filteredShipments().length"
+          [pageIndex]="pageIndex()"
+          [pageSize]="pageSize()"
+          [pageSizeOptions]="pageSizeOptions"
+          (page)="onPage($event)"
+          showFirstLastButtons />
+      </div>
+    }
+  }
+</div>

@@ -1,0 +1,122 @@
+.status-chip {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  background: #e8eaed;
+  color: #3c4043;
+  white-space: nowrap;
+}
+
+.status-pending {
+  background: #fff3e0;
+  color: #8a4b00;
+}
+
+.status-processing,
+.status-picked {
+  background: #e3f2fd;
+  color: #0b4a8f;
+}
+
+.status-packed {
+  background: #ede7f6;
+  color: #4527a0;
+}
+
+.status-shipped {
+  background: #e0f2f1;
+  color: #00695c;
+}
+
+.status-delivered {
+  background: #e6f4ea;
+  color: #1b5e20;
+}
+
+.status-cancelled {
+  background: #fce8e6;
+  color: #b3261e;
+}
+
+.priority-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  color: #b3261e;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.expand-btn mat-icon {
+  transition: transform 0.15s ease;
+}
+
+.items-summary {
+  display: inline-block;
+  font-size: 0.875rem;
+  line-height: 1.35;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.detail-row td {
+  background: #fafbfc;
+  border-top: 1px solid #eceff1;
+  border-bottom: 1px solid #eceff1;
+}
+
+.order-detail {
+  padding: 0.5rem 0.25rem 0.75rem;
+  overflow-x: auto;
+}
+
+.detail-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+
+  th,
+  td {
+    padding: 0.4rem 0.75rem;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid #f1f3f4;
+  }
+
+  th {
+    color: rgba(0, 0, 0, 0.6);
+    font-weight: 600;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  tfoot td {
+    font-weight: 600;
+    border-bottom: none;
+  }
+}
+
+.stock-short {
+  color: #b3261e;
+  font-weight: 700;
+}
+
+.stock-badge {
+  display: inline-block;
+  margin-left: 0.4rem;
+  padding: 0.05rem 0.45rem;
+  border-radius: 999px;
+  background: #fce8e6;
+  color: #b3261e;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+

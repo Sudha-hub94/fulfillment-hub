@@ -1,0 +1,202 @@
+<div class="page">
+  <header class="page-header">
+    <div>
+      <h1>Orders</h1>
+      <p class="page-subtitle">Track and update the fulfilment status of incoming orders.</p>
+    </div>
+    <button mat-flat-button color="primary" (click)="addOrder()">
+      <mat-icon>add</mat-icon>
+      New Order
+    </button>
+  </header>
+
+  @if (loading()) {
+    <div class="state">
+      <mat-spinner diameter="40" />
+      <p>Loading orders&hellip;</p>
+    </div>
+  } @else if (error()) {
+    <div class="state state-error">
+      <mat-icon>error_outline</mat-icon>
+      <p>{{ error() }}</p>
+      <button mat-stroked-button color="warn" (click)="loadOrders()">Retry</button>
+    </div>
+  } @else {
+    <mat-form-field appearance="outline" class="search-field" subscriptSizing="dynamic">
+      <mat-label>Search orders</mat-label>
+      <mat-icon matPrefix>search</mat-icon>
+      <input matInput (input)="applyFilter($event)" placeholder="Order number or customer" />
+    </mat-form-field>
+
+    @if (filteredOrders().length === 0) {
+      <div class="state">
+        <mat-icon>inbox</mat-icon>
+        <p>No orders found.</p>
+      </div>
+    } @else {
+      <div class="table-container mat-elevation-z2">
+        <table mat-table [dataSource]="pagedOrders()">
+          <ng-container matColumnDef="expand">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let order">
+              <button
+                mat-icon-button
+                type="button"
+                class="expand-btn"
+                [attr.aria-label]="'Show line items for ' + order.order_number"
+                [attr.aria-expanded]="expanded() === order"
+                (click)="toggleExpanded(order)">
+                <mat-icon>{{ expanded() === order ? 'expand_more' : 'chevron_right' }}</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="items">
+            <th mat-header-cell *matHeaderCellDef>Items sold</th>
+            <td mat-cell *matCellDef="let order">
+              @if (order.items?.length) {
+                <span class="items-summary">{{ itemsSummary(order) }}</span>
+              } @else {
+                <span class="muted">No line items</span>
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="order_number">
+            <th mat-header-cell *matHeaderCellDef>Order #</th>
+            <td mat-cell *matCellDef="let order">{{ order.order_number }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="customer_name">
+            <th mat-header-cell *matHeaderCellDef>Customer</th>
+            <td mat-cell *matCellDef="let order">
+              {{ order.customer_name }}
+              @if (order.customer_email) {
+                <span class="muted">{{ order.customer_email }}</span>
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let order">
+              <span class="status-chip" [ngClass]="'status-' + order.status">
+                {{ order.status | titlecase }}
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="priority">
+            <th mat-header-cell *matHeaderCellDef>Priority</th>
+            <td mat-cell *matCellDef="let order">
+              @if (order.priority) {
+                <span class="priority-chip">
+                  <mat-icon inline>bolt</mat-icon>
+                  Priority
+                </span>
+              } @else {
+                <span class="muted">Standard</span>
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="total_amount">
+            <th mat-header-cell *matHeaderCellDef>Total</th>
+            <td mat-cell *matCellDef="let order">
+              {{ order.total_amount != null ? (order.total_amount | currency) : '-' }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let order">
+              <button mat-icon-button matTooltip="View details" (click)="viewOrder(order)">
+                <mat-icon>visibility</mat-icon>
+              </button>
+              <button mat-icon-button color="primary" matTooltip="Edit order" (click)="editOrder(order)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" matTooltip="Delete order" (click)="deleteOrder(order)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="expandedDetail">
+            <td
+              mat-cell
+              *matCellDef="let order"
+              class="detail-cell"
+              [attr.colspan]="displayedColumns.length">
+              <div class="order-detail">
+                @if (!order.items?.length) {
+                  <p class="muted">No line items recorded for this order.</p>
+                } @else {
+                  <table class="detail-table">
+                    <thead>
+                      <tr>
+                        <th>Product</th>
+                        <th>SKU</th>
+                        <th>Qty sold</th>
+                        <th>Unit price</th>
+                        <th>Line total</th>
+                        <th>Stock left</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (item of order.items; track item.id) {
+                        <tr>
+                          <td>{{ itemName(item) }}</td>
+                          <td>{{ item.product?.sku ?? '—' }}</td>
+                          <td>{{ item.quantity }}</td>
+                          <td>{{ item.price_per_unit | currency }}</td>
+                          <td>{{ lineTotal(item) | currency }}</td>
+                          <td>
+                            @if (stockForItem(item) === null) {
+                              <span class="muted">—</span>
+                            } @else {
+                              <span [class.stock-short]="isShort(item)">{{ stockForItem(item) }}</span>
+                              @if (isShort(item)) {
+                                <span class="stock-badge">short</span>
+                              }
+                            }
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        <td colspan="4">Items subtotal</td>
+                        <td>{{ itemsSubtotal(order) | currency }}</td>
+                        <td>
+                          @if (totalsDiffer(order)) {
+                            <span class="muted">stored total {{ order.total_amount | currency }}</span>
+                          }
+                        </td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                }
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          <tr
+            mat-row
+            class="detail-row"
+            *matRowDef="let row; columns: ['expandedDetail']; when: isExpandedRow"></tr>
+        </table>
+
+        <mat-paginator
+          [length]="filteredOrders().length"
+          [pageIndex]="pageIndex()"
+          [pageSize]="pageSize()"
+          [pageSizeOptions]="pageSizeOptions"
+          (page)="onPage($event)"
+          showFirstLastButtons />
+      </div>
+    }
+  }
+</div>

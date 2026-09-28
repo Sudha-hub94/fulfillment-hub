@@ -1,0 +1,37 @@
+.status-chip {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  background: #e8eaed;
+  color: #3c4043;
+  white-space: nowrap;
+}
+
+.status-pending {
+  background: #fff3e0;
+  color: #8a4b00;
+}
+
+.status-picked_up {
+  background: #e3f2fd;
+  color: #0b4a8f;
+}
+
+.status-in_transit {
+  background: #ede7f6;
+  color: #4527a0;
+}
+
+.status-delivered {
+  background: #e6f4ea;
+  color: #1b5e20;
+}
+
+.status-exception {
+  background: #fce8e6;
+  color: #b3261e;
+}

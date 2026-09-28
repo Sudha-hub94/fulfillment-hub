@@ -1,0 +1,85 @@
+<h2 mat-dialog-title>{{ title }}</h2>
+
+<form [formGroup]="form" (ngSubmit)="save()">
+  <mat-dialog-content class="dialog-body">
+    <mat-form-field appearance="outline">
+      <mat-label>Order</mat-label>
+      <mat-select formControlName="order_id">
+        @for (order of orders(); track order.id) {
+          <mat-option [value]="order.id">
+            {{ order.order_number }} &mdash; {{ order.customer_name }}
+          </mat-option>
+        }
+      </mat-select>
+      @if (f.order_id.errors?.['required'] || f.order_id.errors?.['min']) {
+        <mat-error>An order is required</mat-error>
+      }
+      @if (orders().length === 0) {
+        <mat-hint>No orders yet &mdash; create one first.</mat-hint>
+      }
+    </mat-form-field>
+
+    <div class="dialog-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Tracking number</mat-label>
+        <input matInput formControlName="tracking_number" placeholder="1Z999AA10123456784" />
+        @if (f.tracking_number.errors?.['required']) {
+          <mat-error>Tracking number is required</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Carrier</mat-label>
+        <input matInput formControlName="carrier" placeholder="UPS" />
+      </mat-form-field>
+    </div>
+
+    <div class="dialog-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Service level</mat-label>
+        <input matInput formControlName="service_level" placeholder="Ground, Express&hellip;" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Status</mat-label>
+        <mat-select formControlName="status">
+          @for (status of statuses; track status) {
+            <mat-option [value]="status">{{ statusLabel(status) }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="dialog-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Shipping cost</mat-label>
+        <input matInput type="number" min="0" step="0.01" formControlName="shipping_cost" />
+        @if (f.shipping_cost.errors?.['min']) {
+          <mat-error>Cost cannot be negative</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Estimated delivery</mat-label>
+        <input matInput type="date" formControlName="estimated_delivery" />
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Actual delivery</mat-label>
+      <input matInput type="date" formControlName="actual_delivery" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Notes</mat-label>
+      <textarea matInput rows="2" formControlName="notes"></textarea>
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="cancel()">Cancel</button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">
+      {{ shipment ? 'Save changes' : 'Create shipment' }}
+    </button>
+  </mat-dialog-actions>
+</form>

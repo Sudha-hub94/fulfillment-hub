@@ -1,0 +1,41 @@
+<mat-toolbar color="primary" class="app-toolbar">
+  <mat-icon class="brand-icon">local_shipping</mat-icon>
+  <span class="brand">Fulfillment Hub</span>
+
+  <nav class="app-nav">
+    <a mat-button routerLink="/dashboard/orders" routerLinkActive="active-link">
+      <mat-icon>receipt_long</mat-icon>
+      Orders
+    </a>
+    <a mat-button routerLink="/dashboard/inventory" routerLinkActive="active-link">
+      <mat-icon>inventory_2</mat-icon>
+      Inventory
+    </a>
+    <a mat-button routerLink="/dashboard/products" routerLinkActive="active-link">
+      <mat-icon>category</mat-icon>
+      Products
+    </a>
+    <a mat-button routerLink="/dashboard/shipments" routerLinkActive="active-link">
+      <mat-icon>local_shipping</mat-icon>
+      Shipments
+    </a>
+  </nav>
+
+  <span class="spacer"></span>
+
+  @if (session$ | async; as session) {
+    <span class="user-name">
+      <mat-icon>account_circle</mat-icon>
+      {{ session.username }}
+    </span>
+  }
+
+  <button mat-button (click)="logout()" matTooltip="Sign out">
+    <mat-icon>logout</mat-icon>
+    Logout
+  </button>
+</mat-toolbar>
+
+<main class="app-content">
+  <router-outlet />
+</main>

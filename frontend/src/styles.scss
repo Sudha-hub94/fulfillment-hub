@@ -1,0 +1,107 @@
+/* You can add global styles to this file, and also import other style files */
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: #f5f6f8;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+/* ---------- Shared page layout (orders / inventory) ---------- */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+
+  h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+}
+
+.page-subtitle {
+  margin: 0.25rem 0 0;
+  font-size: 0.9rem;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.page-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.search-field {
+  width: 24rem;
+  max-width: 100%;
+}
+
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 2.5rem 1rem;
+  color: rgba(0, 0, 0, 0.6);
+  text-align: center;
+
+  mat-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 40px;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.state-error {
+  color: #b3261e;
+}
+
+.table-container {
+  overflow-x: auto;
+  border-radius: 8px;
+  background: #ffffff;
+
+  table {
+    width: 100%;
+  }
+}
+
+.muted {
+  display: block;
+  font-size: 0.85rem;
+  color: rgba(0, 0, 0, 0.55);
+}
+
+/* ---------- Snack bars ---------- */
+
+.app-snack-success {
+  --mdc-snackbar-container-color: #1b5e20;
+  --mdc-snackbar-supporting-text-color: #ffffff;
+  --mat-snack-bar-button-color: #ffffff;
+}
+
+.app-snack-error {
+  --mdc-snackbar-container-color: #b3261e;
+  --mdc-snackbar-supporting-text-color: #ffffff;
+  --mat-snack-bar-button-color: #ffffff;
+}
+

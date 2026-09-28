@@ -1,0 +1,68 @@
+<h2 mat-dialog-title>{{ title }}</h2>
+
+<form [formGroup]="form" (ngSubmit)="save()">
+  <mat-dialog-content class="dialog-body">
+    <div class="dialog-row">
+      <mat-form-field appearance="outline">
+        <mat-label>SKU</mat-label>
+        <input matInput formControlName="sku" placeholder="WID-001" />
+        <mat-hint>Unique stock keeping unit.</mat-hint>
+        @if (f.sku.errors?.['required']) {
+          <mat-error>SKU is required</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Price</mat-label>
+        <input matInput type="number" min="0" step="0.01" formControlName="price" />
+        @if (f.price.errors?.['required']) {
+          <mat-error>Price is required</mat-error>
+        } @else if (f.price.errors?.['min']) {
+          <mat-error>Price must be greater than 0</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" placeholder="Wireless Keyboard" />
+      @if (f.name.errors?.['required']) {
+        <mat-error>Name is required</mat-error>
+      }
+    </mat-form-field>
+
+    <div class="dialog-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Category</mat-label>
+        <input matInput formControlName="category" placeholder="Electronics" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Weight (kg)</mat-label>
+        <input matInput type="number" min="0" step="0.01" formControlName="weight" />
+        @if (f.weight.errors?.['min']) {
+          <mat-error>Weight must be greater than 0</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Dimensions (LxWxH, cm)</mat-label>
+      <input matInput formControlName="dimensions" placeholder="45x15x3" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Description</mat-label>
+      <textarea matInput rows="2" formControlName="description"></textarea>
+    </mat-form-field>
+
+    <mat-slide-toggle formControlName="is_active">Active (orderable)</mat-slide-toggle>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="cancel()">Cancel</button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">
+      {{ product ? 'Save changes' : 'Create product' }}
+    </button>
+  </mat-dialog-actions>
+</form>

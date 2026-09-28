@@ -1,0 +1,22 @@
+.chip {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  background: #e8eaed;
+  color: #3c4043;
+}
+
+.chip-active {
+  background: #e6f4ea;
+  color: #1b5e20;
+}
+
+.chip-inactive {
+  background: #fce8e6;
+  color: #b3261e;
+}

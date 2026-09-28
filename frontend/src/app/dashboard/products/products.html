@@ -1,0 +1,107 @@
+<div class="page">
+  <header class="page-header">
+    <div>
+      <h1>Products</h1>
+      <p class="page-subtitle">Product catalogue: SKUs, pricing and availability.</p>
+    </div>
+    <div class="page-actions">
+      <button mat-stroked-button (click)="loadProducts()">
+        <mat-icon>refresh</mat-icon>
+        Refresh
+      </button>
+      <button mat-flat-button color="primary" (click)="addProduct()">
+        <mat-icon>add</mat-icon>
+        New Product
+      </button>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <div class="state">
+      <mat-spinner diameter="40" />
+      <p>Loading products&hellip;</p>
+    </div>
+  } @else if (error()) {
+    <div class="state state-error">
+      <mat-icon>error_outline</mat-icon>
+      <p>{{ error() }}</p>
+      <button mat-stroked-button color="warn" (click)="loadProducts()">Retry</button>
+    </div>
+  } @else {
+    <mat-form-field appearance="outline" class="search-field" subscriptSizing="dynamic">
+      <mat-label>Search products</mat-label>
+      <mat-icon matPrefix>search</mat-icon>
+      <input matInput (input)="applyFilter($event)" placeholder="SKU, name or category" />
+    </mat-form-field>
+
+    @if (filteredProducts().length === 0) {
+      <div class="state">
+        <mat-icon>inventory_2</mat-icon>
+        <p>No products found.</p>
+      </div>
+    } @else {
+      <div class="table-container mat-elevation-z2">
+        <table mat-table [dataSource]="pagedProducts()">
+          <ng-container matColumnDef="sku">
+            <th mat-header-cell *matHeaderCellDef>SKU</th>
+            <td mat-cell *matCellDef="let product">{{ product.sku }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>Name</th>
+            <td mat-cell *matCellDef="let product">
+              {{ product.name }}
+              @if (product.description) {
+                <span class="muted">{{ product.description }}</span>
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="category">
+            <th mat-header-cell *matHeaderCellDef>Category</th>
+            <td mat-cell *matCellDef="let product">{{ product.category || '-' }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="price">
+            <th mat-header-cell *matHeaderCellDef>Price</th>
+            <td mat-cell *matCellDef="let product">{{ product.price | currency }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let product">
+              <span
+                class="chip"
+                [ngClass]="isActive(product) ? 'chip-active' : 'chip-inactive'">
+                {{ isActive(product) ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let product">
+              <button mat-icon-button color="primary" matTooltip="Edit product" (click)="editProduct(product)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" matTooltip="Delete product" (click)="deleteProduct(product)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        </table>
+
+        <mat-paginator
+          [length]="filteredProducts().length"
+          [pageIndex]="pageIndex()"
+          [pageSize]="pageSize()"
+          [pageSizeOptions]="pageSizeOptions"
+          (page)="onPage($event)"
+          showFirstLastButtons />
+      </div>
+    }
+  }
+</div>

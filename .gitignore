@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+env/
+
+# Local environment / secrets
+.env
+.env.*
+
+# Server logs
+_uvicorn_out.txt
+_uvicorn_err.txt
+*.log
+
+# Node / Angular (also covered by frontend/.gitignore)
+node_modules/
+dist/
+.angular/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# NOTE: backend/fulfillment_hub.db is intentionally committed —
+# it carries the demo seed data (products, orders, shipments).

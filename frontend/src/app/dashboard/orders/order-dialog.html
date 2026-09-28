@@ -1,0 +1,198 @@
+<h2 mat-dialog-title>{{ title }}</h2>
+
+<form [formGroup]="form" (ngSubmit)="save()">
+  <mat-dialog-content class="dialog-body">
+    <mat-form-field appearance="outline">
+      <mat-label>Order number</mat-label>
+      <input matInput formControlName="order_number" placeholder="SO-1001" />
+      @if (f.order_number.errors?.['required']) {
+        <mat-error>Order number is required</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Customer name</mat-label>
+      <input matInput formControlName="customer_name" placeholder="Acme Retail" />
+      @if (f.customer_name.errors?.['required']) {
+        <mat-error>Customer name is required</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Customer email</mat-label>
+      <input matInput type="email" formControlName="customer_email" placeholder="ops@acme.test" />
+      @if (f.customer_email.errors?.['email']) {
+        <mat-error>Enter a valid email address</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Shipping address</mat-label>
+      <textarea matInput rows="2" formControlName="customer_address"></textarea>
+    </mat-form-field>
+
+    <div class="dialog-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Status</mat-label>
+        <mat-select formControlName="status">
+          @for (status of statuses; track status) {
+            <mat-option [value]="status">{{ status | titlecase }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Total amount</mat-label>
+        <input matInput type="number" min="0" step="0.01" formControlName="total_amount" [readonly]="creating" />
+        @if (creating) {
+          <mat-hint>Calculated from the line items below</mat-hint>
+        }
+      </mat-form-field>
+    </div>
+
+    <mat-slide-toggle formControlName="priority">Priority order</mat-slide-toggle>
+
+    <!-- ================ Items sold ================ -->
+    <div class="section-header">
+      <h3>Items sold</h3>
+      @if (canEditLines) {
+        <button
+          mat-stroked-button
+          type="button"
+          (click)="addLine()"
+          [disabled]="products().length === 0">
+          <mat-icon>add</mat-icon>
+          Add line
+        </button>
+      }
+    </div>
+
+    @if (canEditLines) {
+      @if (products().length === 0) {
+        <p class="muted">No products in the catalog yet — add one on the Products tab first.</p>
+      }
+
+      @for (line of lines(); track $index; let i = $index) {
+        <div class="line-row">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>Product</mat-label>
+            <mat-select [value]="line.product_id" (selectionChange)="onLineProduct(i, $event.value)">
+              @for (product of products(); track product.id) {
+                <mat-option [value]="product.id">{{ product.sku }} — {{ product.name }}</mat-option>
+              }
+            </mat-select>
+            <mat-hint [class.hint-warn]="isShort(line)">{{ stockHint(line) }}</mat-hint>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>Qty</mat-label>
+            <input
+              matInput
+              type="number"
+              min="1"
+              [value]="line.quantity"
+              (input)="onLineQuantity(i, $any($event.target).value)"
+              (change)="onLineQuantity(i, $any($event.target).value, true)" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>Unit price</mat-label>
+            <input
+              matInput
+              type="number"
+              min="0"
+              step="0.01"
+              [value]="line.price_per_unit"
+              (input)="onLinePrice(i, $any($event.target).value)"
+              (change)="onLinePrice(i, $any($event.target).value, true)" />
+          </mat-form-field>
+
+          <span class="line-total">{{ lineTotal(line) | currency }}</span>
+
+          <button
+            mat-icon-button
+            color="warn"
+            type="button"
+            matTooltip="Remove line"
+            [attr.aria-label]="'Remove line ' + (i + 1)"
+            (click)="removeLine(i)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      }
+
+      @if (lines().length === 0 && products().length > 0) {
+        <p class="muted">No line items yet — add what the customer is buying.</p>
+      }
+      @if (linesError()) {
+        <p class="form-error">{{ linesError() }}</p>
+      }
+      @if (lines().length > 0) {
+        <div class="total-line">
+          <span>Order total (from line items)</span>
+          <strong>{{ grandTotal() | currency }}</strong>
+        </div>
+      }
+    } @else {
+      <!-- Read-only breakdown for edit / detail view (stock = what is left). -->
+      <table class="line-table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Qty</th>
+            <th>Unit price</th>
+            <th>Line total</th>
+            <th>Stock left</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (line of lines(); track $index) {
+            <tr>
+              <td>
+                <span>{{ line.name }}</span>
+                <span class="muted">{{ line.sku }}</span>
+              </td>
+              <td>{{ line.quantity }}</td>
+              <td>{{ line.price_per_unit | currency }}</td>
+              <td>{{ lineTotal(line) | currency }}</td>
+              <td [class.stock-short]="isShort(line)">{{ stockFor(line.product_id) ?? '—' }}</td>
+            </tr>
+          }
+          @if (lines().length === 0) {
+            <tr>
+              <td colspan="5">No line items recorded for this order.</td>
+            </tr>
+          }
+        </tbody>
+        @if (lines().length > 0) {
+          <tfoot>
+            <tr>
+              <td colspan="3">Items subtotal</td>
+              <td>{{ grandTotal() | currency }}</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        }
+      </table>
+      @if (!readOnly) {
+        <p class="muted hint">
+          Line items are recorded when the order is created — customer details and status can
+          still be updated here.
+        </p>
+      }
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="cancel()">{{ readOnly ? 'Close' : 'Cancel' }}</button>
+    @if (!readOnly) {
+      <button
+        mat-flat-button
+        color="primary"
+        type="submit"
+        [disabled]="form.invalid || (creating && lines().length === 0)">
+        {{ order ? 'Save changes' : 'Create order' }}
+      </button>
+    }
+  </mat-dialog-actions>
+</form>
